@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">VideoDataUsageApp</string>
+    <string name="title">HCI Video Usage Tracking App</string>
+    <string name="channel_name">VideoDataUsageApp</string>
+    <string name="channel_description" />
+    <string name="notification_service_started">Collection service is running</string>
+    <string name="intro_txt">This app runs as a background service during conference calls and collects the data transmitted/received by apps like zoom, google meet, microsoft teams and whatsapp. This data is anonymyzed and sent to a server for storage and analysis. The experimenter can control the start and end of data collection using REST APIs. When the start API is invoked, the server broadcasts a START signal to all the connected phones and the timestamp of acquisition of this signal is recorded within the phone. Starting from this timestamp, data for video conferencing apps is collected until the moment the stop API is invoked.</string>
+</resources>
