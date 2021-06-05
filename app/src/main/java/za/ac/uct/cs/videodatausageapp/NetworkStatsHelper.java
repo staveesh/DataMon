@@ -28,79 +28,134 @@ public class NetworkStatsHelper {
     }
 
     public long getPackageRxBytesWifi(long startTime,long endTime) {
-        NetworkStats networkStats = null;
-        networkStats = networkStatsManager.queryDetailsForUid(
+        NetworkStats startStats, endStats = null;
+        startStats = networkStatsManager.queryDetailsForUid(
                 ConnectivityManager.TYPE_WIFI,
                 "",
+                0,
                 startTime,
+                packageUid);
+
+        long startBytes = 0L;
+        NetworkStats.Bucket bucket = new NetworkStats.Bucket();
+        while (startStats.hasNextBucket()) {
+            startStats.getNextBucket(bucket);
+            startBytes += bucket.getRxBytes();
+        }
+        startStats.close();
+
+        endStats = networkStatsManager.queryDetailsForUid(
+                ConnectivityManager.TYPE_WIFI,
+                "",
+                0,
                 endTime,
                 packageUid);
 
-        long rxBytes = 0L;
-        NetworkStats.Bucket bucket = new NetworkStats.Bucket();
-        while (networkStats.hasNextBucket()) {
-            networkStats.getNextBucket(bucket);
-            rxBytes += bucket.getRxBytes();
+        long endBytes = 0L;
+        bucket = new NetworkStats.Bucket();
+        while (endStats.hasNextBucket()) {
+            endStats.getNextBucket(bucket);
+            endBytes += bucket.getRxBytes();
         }
-        networkStats.close();
-        return rxBytes;
+        endStats.close();
+        return endBytes-startBytes;
     }
 
     public long getPackageTxBytesWifi(long startTime,long endTime) {
-        NetworkStats networkStats = null;
-        networkStats = networkStatsManager.queryDetailsForUid(
+        NetworkStats startStats, endStats = null;
+        startStats = networkStatsManager.queryDetailsForUid(
                 ConnectivityManager.TYPE_WIFI,
                 "",
+                0,
                 startTime,
+                packageUid);
+
+        long startBytes = 0L;
+        NetworkStats.Bucket bucket = new NetworkStats.Bucket();
+        while (startStats.hasNextBucket()) {
+            startStats.getNextBucket(bucket);
+            startBytes += bucket.getTxBytes();
+        }
+        startStats.close();
+        endStats = networkStatsManager.queryDetailsForUid(
+                ConnectivityManager.TYPE_WIFI,
+                "",
+                0,
                 endTime,
                 packageUid);
 
-        long txBytes = 0L;
-        NetworkStats.Bucket bucket = new NetworkStats.Bucket();
-        while (networkStats.hasNextBucket()) {
-            networkStats.getNextBucket(bucket);
-            txBytes += bucket.getTxBytes();
+        long endBytes = 0L;
+        bucket = new NetworkStats.Bucket();
+        while (endStats.hasNextBucket()) {
+            endStats.getNextBucket(bucket);
+            endBytes += bucket.getTxBytes();
         }
-        networkStats.close();
-        return txBytes;
+        endStats.close();
+        return endBytes-startBytes;
     }
 
     public long getPackageRxBytesMobile(long startTime, long endTime, String subscriberId){
-        NetworkStats networkStats = null;
-        networkStats = networkStatsManager.queryDetailsForUid(
+        NetworkStats startStats = null, endStats = null;
+        startStats = networkStatsManager.queryDetailsForUid(
                 ConnectivityManager.TYPE_MOBILE,
                 subscriberId,
+                0,
                 startTime,
+                packageUid
+        );
+        long startBytes = 0L, endBytes = 0L;
+        NetworkStats.Bucket bucket = new NetworkStats.Bucket();
+        while (startStats.hasNextBucket()) {
+            startStats.getNextBucket(bucket);
+            startBytes += bucket.getRxBytes();
+        }
+        startStats.close();
+        endStats = networkStatsManager.queryDetailsForUid(
+                ConnectivityManager.TYPE_MOBILE,
+                subscriberId,
+                0,
                 endTime,
                 packageUid
         );
-        long rxBytes = 0L;
-        NetworkStats.Bucket bucket = new NetworkStats.Bucket();
-        while (networkStats.hasNextBucket()) {
-            networkStats.getNextBucket(bucket);
-            rxBytes += bucket.getRxBytes();
+        bucket = new NetworkStats.Bucket();
+        while (endStats.hasNextBucket()) {
+            endStats.getNextBucket(bucket);
+            endBytes += bucket.getRxBytes();
         }
-        networkStats.close();
-        return rxBytes;
+        endStats.close();
+        return endBytes-startBytes;
     }
 
     public long getPackageTxBytesMobile(long startTime, long endTime, String subscriberId){
-        NetworkStats networkStats = null;
-        networkStats = networkStatsManager.queryDetailsForUid(
+        NetworkStats startStats = null, endStats = null;
+        startStats = networkStatsManager.queryDetailsForUid(
                 ConnectivityManager.TYPE_MOBILE,
                 subscriberId,
+                0,
                 startTime,
+                packageUid
+        );
+        long startBytes = 0L, endBytes = 0L;
+        NetworkStats.Bucket bucket = new NetworkStats.Bucket();
+        while (startStats.hasNextBucket()) {
+            startStats.getNextBucket(bucket);
+            startBytes += bucket.getTxBytes();
+        }
+        startStats.close();
+        endStats = networkStatsManager.queryDetailsForUid(
+                ConnectivityManager.TYPE_MOBILE,
+                subscriberId,
+                0,
                 endTime,
                 packageUid
         );
-        long rxBytes = 0L;
-        NetworkStats.Bucket bucket = new NetworkStats.Bucket();
-        while (networkStats.hasNextBucket()) {
-            networkStats.getNextBucket(bucket);
-            rxBytes += bucket.getTxBytes();
+        bucket = new NetworkStats.Bucket();
+        while (endStats.hasNextBucket()) {
+            endStats.getNextBucket(bucket);
+            endBytes += bucket.getTxBytes();
         }
-        networkStats.close();
-        return rxBytes;
+        endStats.close();
+        return endBytes-startBytes;
     }
 
 }

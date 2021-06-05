@@ -57,7 +57,7 @@ public class NetworkSummaryCollector {
                                     if (!mobileSimPayload.isEmptyPayload()) {
                                         JSONObject appData = new JSONObject();
                                         appData.put("operator", operatorName);
-                                        appData.put("name", packageName);
+                                        appData.put("app", packageName);
                                         appData.put("rx", mobileSimPayload.getRx());
                                         appData.put("tx", mobileSimPayload.getTx());
                                         mobileSummary.put(appData);
@@ -69,7 +69,7 @@ public class NetworkSummaryCollector {
                     if (!wifiPayload.isEmptyPayload()) {
                         JSONObject appData = new JSONObject();
                         appData.put("operator", "WIFI");
-                        appData.put("name", packageName);
+                        appData.put("app", packageName);
                         appData.put("rx", wifiPayload.getRx());
                         appData.put("tx", wifiPayload.getTx());
                         wifiSummary.put(appData);

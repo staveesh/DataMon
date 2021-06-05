@@ -6,7 +6,7 @@ import java.util.List;
 public interface Config {
 
     int SERVER_PORT=8080;
-    String SERVER_HOST_ADDRESS = "159.65.35.26";
+    String SERVER_HOST_ADDRESS = "192.168.1.77";
 
     String STOMP_SERVER_CONNECT_ENDPOINT = "/uctHci";
     String STOMP_SERVER_SUMMARY_REPORT_ENDPOINT = "/device/usage-summary";
