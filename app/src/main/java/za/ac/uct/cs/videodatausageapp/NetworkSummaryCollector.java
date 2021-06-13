@@ -43,25 +43,23 @@ public class NetworkSummaryCollector {
                     String packageName = pckg.getPackageName();
                     DataPayload wifiPayload = getWifiBytes(packageName, startTime, endTime);
                     SubscriptionManager subscriptionManager = null;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
-                        subscriptionManager = SubscriptionManager.from(context);
-                        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-                            List<SubscriptionInfo> activeSubscriptionInfoList = subscriptionManager.getActiveSubscriptionInfoList();
-                            TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-                            for (SubscriptionInfo subscriptionInfo : activeSubscriptionInfoList) {
-                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                                    TelephonyManager manager1 = manager.createForSubscriptionId(subscriptionInfo.getSubscriptionId());
-                                    String operatorName = manager1.getNetworkOperatorName();
-                                    String subscriberId = getSubscriberId(manager1);
-                                    DataPayload mobileSimPayload = getMobileBytes(packageName, startTime, endTime, subscriberId);
-                                    if (!mobileSimPayload.isEmptyPayload()) {
-                                        JSONObject appData = new JSONObject();
-                                        appData.put("operator", operatorName);
-                                        appData.put("app", packageName);
-                                        appData.put("rx", mobileSimPayload.getRx());
-                                        appData.put("tx", mobileSimPayload.getTx());
-                                        mobileSummary.put(appData);
-                                    }
+                    subscriptionManager = SubscriptionManager.from(context);
+                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+                        List<SubscriptionInfo> activeSubscriptionInfoList = subscriptionManager.getActiveSubscriptionInfoList();
+                        TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+                        for (SubscriptionInfo subscriptionInfo : activeSubscriptionInfoList) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                TelephonyManager manager1 = manager.createForSubscriptionId(subscriptionInfo.getSubscriptionId());
+                                String operatorName = manager1.getNetworkOperatorName();
+                                String subscriberId = getSubscriberId(manager1);
+                                DataPayload mobileSimPayload = getMobileBytes(packageName, startTime, endTime, subscriberId);
+                                if (!mobileSimPayload.isEmptyPayload()) {
+                                    JSONObject appData = new JSONObject();
+                                    appData.put("operator", operatorName);
+                                    appData.put("app", packageName);
+                                    appData.put("rx", mobileSimPayload.getRx());
+                                    appData.put("tx", mobileSimPayload.getTx());
+                                    mobileSummary.put(appData);
                                 }
                             }
                         }

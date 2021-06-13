@@ -2,6 +2,7 @@ package za.ac.uct.cs.videodatausageapp;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -10,6 +11,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import io.reactivex.CompletableTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -102,9 +104,17 @@ public class WebSocketConnector {
         mStompClient.connect(headers);
     }
 
-    @SuppressLint("HardwareIds")
     public String getDeviceId() {
-        return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        String uuid;
+        SharedPreferences uniqueIdPref = context.getSharedPreferences(Config.PREF_KEY_UNIQUE_ID, Context.MODE_PRIVATE);
+        uuid = uniqueIdPref.getString(Config.PREF_KEY_UNIQUE_ID, null);
+        if(uuid == null) {
+            uuid = UUID.randomUUID().toString()+"_"+Util.hashTimeStamp();
+            SharedPreferences.Editor edit = uniqueIdPref.edit();
+            edit.putString(Config.PREF_KEY_UNIQUE_ID, uuid);
+            edit.apply();
+        }
+        return uuid;
     }
 
     public void sendMessage(String endpoint, String content) {
