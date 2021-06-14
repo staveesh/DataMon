@@ -19,8 +19,10 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
                 Log.d(TAG, "onReceive: Not connected");
             } else {
                 Log.d(TAG, "onReceive: Connected");
+                WebSocketConnector connector = WebSocketConnector.getInstance();
+                WebSocketConnector.setContext(context);
+                if(!connector.isConnected()) connector.connectWebSocket(Util.getWebSocketTarget());
             }
-            WebSocketConnector.getInstance().connectWebSocket(Util.getWebSocketTarget());
         }
     }
 }

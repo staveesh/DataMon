@@ -10,16 +10,21 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.DialogFragment;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -39,6 +44,10 @@ public class MainActivity extends AppCompatActivity {
     private boolean isBindingToService = false;
     private static MainActivity app;
     private NetworkChangeReceiver connectivityReceiver;
+    private String institution = null;
+    private String consent = "NO";
+    private String wonRaffle = "NO";
+    private TextView welcomeText;
 
     private ServiceConnection serviceConn = new ServiceConnection() {
         @Override
@@ -59,9 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
-        bindToService();
         super.onStart();
-        registerReceiver(connectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     private void bindToService() {
@@ -87,10 +94,93 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         app = this;
         setContentView(R.layout.activity_main);
-        connectToServer();
+        restoreRaffleStatus();
+        welcomeText = findViewById(R.id.welcomeText);
+        if(wonRaffle.equalsIgnoreCase("yes")){
+            Resources res = getResources();
+            String raffleText = res.getString(R.string.raffle_victory_welcome_text);
+            welcomeText.setText(String.format(raffleText, Config.RAFFLE_CLAIM_EMAIL,
+                    WebSocketConnector.getInstance().getDeviceId()));
+        }
+        if(consent.equalsIgnoreCase("no")) {
+            consentDialogWrapper();
+        }
+    }
+
+    private void restoreRaffleStatus() {
+        SharedPreferences prefs = getSharedPreferences(Config.PREF_KEY_RAFFLE_STATUS, MODE_PRIVATE);
+        wonRaffle = prefs.getString(Config.PREF_KEY_RAFFLE_STATUS, "NO");
+    }
+
+    private void restoreUserInstitution(){
+        SharedPreferences prefs = getSharedPreferences(Config.PREF_KEY_USER_INSTITUTION, MODE_PRIVATE);
+        institution = prefs.getString(Config.PREF_KEY_USER_INSTITUTION, null);
+    }
+
+    private void restoreUserConsent(){
+        SharedPreferences prefs = getSharedPreferences(Config.PREF_KEY_USER_CONSENT, MODE_PRIVATE);
+        consent = prefs.getString(Config.PREF_KEY_USER_CONSENT, "no");
+    }
+
+    private void consentDialogWrapper(){
+        restoreUserConsent();
+        if(consent.equalsIgnoreCase("no")){
+            showConsentDialog();
+        }
+    }
+
+    private void showConsentDialog() {
+        DialogFragment consentDialog = ConsentDialog.newInstance();
+        consentDialog.show(getSupportFragmentManager(), "consent");
+    }
+
+    private void institutionDialogWrapper(){
+        restoreUserInstitution();
+        if(institution == null){
+            showInstitutionDialog();
+        }
+    }
+
+    void showInstitutionDialog(){
+        DialogFragment selectUni = InstitutionDialog.newInstance();
+        selectUni.show(getSupportFragmentManager(), "institution");
+    }
+
+    public void userCancelled(){
+        Log.i("Institution", "No institution selected!");
+        quitApp();
+    }
+
+    private void quitApp() {
+        if (isBound) {
+            unbindService(serviceConn);
+            isBound = false;
+        }
+        if (this.connectivityReceiver != null) {
+            unregisterReceiver(connectivityReceiver);
+        }
+
+        this.finish();
+        System.exit(0);
+    }
+
+    public void consentProvided(){
+        consent = "YES";
+        if (institution == null)
+            institutionDialogWrapper();
+    }
+
+    public void institutionSelected(String selection){
+        institution = selection;
+        SharedPreferences prefs = getSharedPreferences(Config.PREF_KEY_USER_INSTITUTION, MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(Config.PREF_KEY_USER_INSTITUTION, selection);
+        editor.apply();
         initService();
         requestAppPermissions();
         connectivityReceiver = new NetworkChangeReceiver();
+        bindToService();
+        registerReceiver(connectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     private void requestAppPermissions() {
@@ -133,13 +223,6 @@ public class MainActivity extends AppCompatActivity {
     private void initService() {
         Intent intent = new Intent(this, CollectionService.class);
         this.startService(intent);
-    }
-
-    private void connectToServer() {
-        String target = Util.getWebSocketTarget();
-        WebSocketConnector webSocketConnector = WebSocketConnector.getInstance();
-        WebSocketConnector.setContext(getBaseContext());
-        webSocketConnector.connectWebSocket(target);
     }
 
     public static MainActivity getCurrentApp() {

@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.usage.NetworkStatsManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -26,20 +27,23 @@ import java.util.List;
 
 public class NetworkSummaryCollector {
     private static final String TAG = "NetworkSummaryCollector";
-    Context context ;
+    Context context;
+    String institution;
 
-    public NetworkSummaryCollector(Context context){
+    public NetworkSummaryCollector(Context context) {
         this.context = context;
+        SharedPreferences prefs = context.getSharedPreferences(Config.PREF_KEY_USER_INSTITUTION, Context.MODE_PRIVATE);
+        institution = prefs.getString(Config.PREF_KEY_USER_INSTITUTION, null);
     }
 
     public String collectSummary(String deviceId, long startTime, long endTime) {
-        List<Package> packageList=getPackagesData();
+        List<Package> packageList = getPackagesData();
         JSONArray wifiSummary = new JSONArray();
         JSONArray mobileSummary = new JSONArray();
         try {
             for (Package pckg : packageList) {
-                if(Config.VIDEO_CALL_APP_PACKAGES.contains(pckg.getName())) {
-                    Log.d(TAG, "collectSummary: "+pckg.getName());
+                if (Config.APPS_LIST.contains(pckg.getName())) {
+                    Log.d(TAG, "collectSummary: " + pckg.getName());
                     String packageName = pckg.getPackageName();
                     DataPayload wifiPayload = getWifiBytes(packageName, startTime, endTime);
                     SubscriptionManager subscriptionManager = null;
@@ -75,6 +79,7 @@ public class NetworkSummaryCollector {
                 }
             }
             JSONObject blob = new JSONObject();
+            blob.put("institution", institution);
             blob.put("deviceId", deviceId);
             blob.put("startTime", startTime);
             blob.put("endTime", endTime);

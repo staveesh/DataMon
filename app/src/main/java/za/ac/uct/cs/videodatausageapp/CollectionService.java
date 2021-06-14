@@ -14,8 +14,8 @@ import androidx.core.app.NotificationCompat;
 
 public class CollectionService extends Service {
 
-    private static final int NOTIFICATION_ID = 1234;
-    private static final String CHANNEL_ID = "videoDataUsage_01";
+    private static final int NOTIFICATION_ID_SERVICE = 1234;
+    private static final String CHANNEL_ID_SERVICE = "videoDataUsage_01";
 
     private final IBinder binder = new CollectionBinder();
     private NotificationManager notificationManager;
@@ -42,7 +42,7 @@ public class CollectionService extends Service {
             CharSequence name = getString(R.string.channel_name);
             String description = getString(R.string.channel_description);
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID_SERVICE, name, importance);
             channel.setDescription(description);
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
@@ -50,18 +50,18 @@ public class CollectionService extends Service {
             notificationManager.createNotificationChannel(channel);
         }
         // Start in foreground
-        startForeground(NOTIFICATION_ID, createServiceRunningNotification());
+        startForeground(NOTIFICATION_ID_SERVICE, createServiceRunningNotification());
     }
 
     private Notification createServiceRunningNotification() {
         // The intent to launch when the user clicks the expanded notification
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendIntent =
-                PendingIntent.getActivity(this, 0, intent,
+                PendingIntent.getActivity(this, 1, intent,
                         PendingIntent.FLAG_CANCEL_CURRENT);
 
-        Notification notice = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+        Notification notice = new NotificationCompat.Builder(this, CHANNEL_ID_SERVICE)
+                .setSmallIcon(R.drawable.logo)
                 .setContentTitle(getString(R.string.notification_service_started))
                 .setWhen(System.currentTimeMillis())
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -71,6 +71,26 @@ public class CollectionService extends Service {
                 Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
 
         return notice;
+    }
+
+    public void createRaffleNotification() {
+        // The intent to launch when the user clicks the expanded notification
+        Intent intent = new Intent(this, MainActivity.class);
+        PendingIntent pendIntent =
+                PendingIntent.getActivity(this, 0, intent,
+                        PendingIntent.FLAG_CANCEL_CURRENT);
+
+        Notification notice = new NotificationCompat.Builder(this, CHANNEL_ID_SERVICE)
+                .setSmallIcon(R.drawable.logo)
+                .setContentTitle(getString(R.string.notification_raffle_victory))
+                .setWhen(System.currentTimeMillis())
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendIntent)
+                .build();
+        notice.flags |=
+                Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
+
+        startForeground(NOTIFICATION_ID_SERVICE, notice);
     }
 
     @Override
