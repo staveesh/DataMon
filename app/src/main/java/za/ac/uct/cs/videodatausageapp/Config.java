@@ -5,8 +5,8 @@ import java.util.List;
 
 public interface Config {
 
-    int SERVER_PORT=8080;
-    String SERVER_HOST_ADDRESS = "159.65.35.26";
+    int SERVER_PORT=7800;
+    String SERVER_HOST_ADDRESS = "jchavula-1.cs.uct.ac.za";
 
     String PREF_KEY_UNIQUE_ID = "PREF_KEY_UNIQUE_ID";
 

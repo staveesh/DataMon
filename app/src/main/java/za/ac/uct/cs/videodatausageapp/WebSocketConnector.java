@@ -13,11 +13,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
+
 import io.reactivex.CompletableTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.OkHttpClient;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
 import ua.naiksoftware.stomp.dto.StompHeader;
@@ -69,7 +73,16 @@ public class WebSocketConnector {
         if(target == null)
             return;
         String deviceId = getDeviceId();
-        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, target);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .hostnameVerifier(new HostnameVerifier() {
+                    @SuppressLint("BadHostnameVerifier")
+                    @Override
+                    public boolean verify(String hostname, SSLSession session) {
+                        return true;
+                    }
+                })
+                .build();
+        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, target, null, client);
         List<StompHeader> headers = new ArrayList<StompHeader>() {{
             add(new StompHeader("deviceId", deviceId));
         }};
