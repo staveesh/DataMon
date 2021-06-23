@@ -39,7 +39,7 @@ public class Util {
             return null;
         }
         executor.shutdown();
-        return "ws://" + serverIP + ":" + Config.SERVER_PORT + Config.STOMP_SERVER_CONNECT_ENDPOINT;
+        return "wss://" + serverIP + ":" + Config.SERVER_PORT + Config.STOMP_SERVER_CONNECT_ENDPOINT;
     }
 
     public static String hashTimeStamp() {
