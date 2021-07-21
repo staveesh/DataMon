@@ -99,12 +99,6 @@ public class NetworkSummaryCollector {
     private List<Package> getPackagesData() {
         PackageManager packageManager = MainActivity.getCurrentApp().getPackageManager();
         List<PackageInfo> packageInfoList = packageManager.getInstalledPackages(PackageManager.GET_META_DATA);
-        Collections.sort(packageInfoList, new Comparator<PackageInfo>() {
-            @Override
-            public int compare(PackageInfo o1, PackageInfo o2) {
-                return (int) ((o2.lastUpdateTime - o1.lastUpdateTime) / 10);
-            }
-        });
         List<Package> packageList = new ArrayList<>(packageInfoList.size());
         for (PackageInfo packageInfo : packageInfoList) {
             if (packageManager.checkPermission(Manifest.permission.INTERNET,
