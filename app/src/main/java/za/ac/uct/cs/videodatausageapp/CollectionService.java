@@ -73,26 +73,6 @@ public class CollectionService extends Service {
         return notice;
     }
 
-    public void createRaffleNotification() {
-        // The intent to launch when the user clicks the expanded notification
-        Intent intent = new Intent(this, MainActivity.class);
-        PendingIntent pendIntent =
-                PendingIntent.getActivity(this, 0, intent,
-                        PendingIntent.FLAG_CANCEL_CURRENT);
-
-        Notification notice = new NotificationCompat.Builder(this, CHANNEL_ID_SERVICE)
-                .setSmallIcon(R.drawable.logo)
-                .setContentTitle(getString(R.string.notification_raffle_victory))
-                .setWhen(System.currentTimeMillis())
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendIntent)
-                .build();
-        notice.flags |=
-                Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
-
-        startForeground(NOTIFICATION_ID_SERVICE, notice);
-    }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         return START_STICKY;

@@ -53,7 +53,6 @@ public class WebSocketConnector {
     private List<Disposable> getSubscriptions(){
         return new ArrayList<Disposable>(){{
             add(subscribeToControlTopic());
-            add(subscribeToRaffleNotification());
         }};
     }
 
@@ -66,19 +65,6 @@ public class WebSocketConnector {
                 sendMessage(Config.STOMP_SERVER_SUMMARY_REPORT_ENDPOINT, summary);
             } catch (JSONException e) {
                 Log.e(TAG, "subscribeToControlTopic: Invalid response from server");
-            }
-        });
-    }
-
-
-    private Disposable subscribeToRaffleNotification() {
-        return subscribeToTopic(String.format(Config.STOMP_SERVER_RAFFLE_ENDPOINT, getDeviceId()), result -> {
-            if(result.getPayload().equalsIgnoreCase("victory")){
-                SharedPreferences prefs = context.getSharedPreferences(Config.PREF_KEY_RAFFLE_STATUS, Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putString(Config.PREF_KEY_RAFFLE_STATUS, "YES");
-                editor.apply();
-                MainActivity.getCurrentApp().getCollector().createRaffleNotification();
             }
         });
     }

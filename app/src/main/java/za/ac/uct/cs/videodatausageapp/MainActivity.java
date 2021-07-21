@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
     private NetworkChangeReceiver connectivityReceiver;
     private String institution = null;
     private String consent = "NO";
-    private String wonRaffle = "NO";
     private TextView welcomeText;
 
     private ServiceConnection serviceConn = new ServiceConnection() {
@@ -94,22 +93,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         app = this;
         setContentView(R.layout.activity_main);
-        restoreRaffleStatus();
         welcomeText = findViewById(R.id.welcomeText);
-        if(wonRaffle.equalsIgnoreCase("yes")){
-            Resources res = getResources();
-            String raffleText = res.getString(R.string.raffle_victory_welcome_text);
-            welcomeText.setText(String.format(raffleText, Config.RAFFLE_CLAIM_EMAIL,
-                    WebSocketConnector.getInstance().getDeviceId()));
-        }
         if(consent.equalsIgnoreCase("no")) {
             consentDialogWrapper();
         }
-    }
-
-    private void restoreRaffleStatus() {
-        SharedPreferences prefs = getSharedPreferences(Config.PREF_KEY_RAFFLE_STATUS, MODE_PRIVATE);
-        wonRaffle = prefs.getString(Config.PREF_KEY_RAFFLE_STATUS, "NO");
     }
 
     private void restoreUserInstitution(){

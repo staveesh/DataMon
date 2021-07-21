@@ -4,7 +4,5 @@
     <string name="channel_name">DataMon</string>
     <string name="channel_description" />
     <string name="notification_service_started">Collection service is running</string>
-    <string name="notification_raffle_victory">You have won the lucky draw! Tap here to claim! </string>
-    <string name="raffle_victory_welcome_text">Congratulations! You have won our lucky draw! Click a screenshot of this screen and email it to \n <b>%1$s</b>\n\n\nYour device ID is \n<b>%2$s</b></string>
     <string name="intro_txt">This app runs as a background service and collects the data transmitted/received by a selected list of apps. This data is anonymyzed and sent to a server for storage and analysis. The experimenter can control the start and end of data collection using REST APIs. For a given time interval, the data for all apps is collected and sent to the server.</string>
 </resources>
