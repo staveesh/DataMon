@@ -20,8 +20,7 @@ public class ConsentDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
-        alertBuilder.setTitle("Consent for data usage collection");
-        alertBuilder.setMessage("Do you agree to provide your consent for application data usage collection from your phone?");
+        alertBuilder.setMessage(R.string.consent_text);
         alertBuilder.setPositiveButton("Yes", (dialog, which) -> ((MainActivity) getActivity()).consentProvided());
         alertBuilder.setNegativeButton("No", (dialog, which) -> ((MainActivity) getActivity()).userCancelled());
         return alertBuilder.create();

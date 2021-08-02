@@ -4,5 +4,7 @@
     <string name="channel_name">DataMon</string>
     <string name="channel_description" />
     <string name="notification_service_started">Collection service is running</string>
-    <string name="intro_txt">This app runs as a background service and collects the data transmitted/received by a selected list of apps. This data is anonymyzed and sent to a server for storage and analysis. The experimenter can control the start and end of data collection using REST APIs. For a given time interval, the data for all apps is collected and sent to the server.</string>
+    <string name="consent_text"><b> Project: Understanding Bandwidth constraints on university students during the COVID-19 Pandemic lockdown, within a South African context</b>\n\nDo you agree to provide your consent for the application to collect usage data from your phone during this study?\nBy clicking yes, you agree to the consent form provided by the researcher for the above-mentioned study.</string>
+    <string name="uni_selection_text">Please select the University you are registered with: </string>
+    <string name="intro_txt">Thank you for participating in the study Titled: Understanding Bandwidth constraints on university students during the COVID-19 Pandemic lockdown, within a South African context. This application runs as a background service and collects usage data of a selected list of applications. This data is anonymized and sent to a server for storage and analysis. \n\n For more information on this project, you can browse to http://net4d.cs.uct.ac.za/</string>
 </resources>

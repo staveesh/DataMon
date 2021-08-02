@@ -20,7 +20,7 @@ public class InstitutionDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
-        alertBuilder.setTitle("Select your University");
+        alertBuilder.setTitle(R.string.uni_selection_text);
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item);
         adapter.add("CPUT");
         adapter.add("UCT");
@@ -31,7 +31,6 @@ public class InstitutionDialog extends DialogFragment {
                 ((MainActivity) getActivity()).userCancelled();
             }
         });
-
         alertBuilder.setAdapter(adapter, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
