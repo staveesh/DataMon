@@ -20,8 +20,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class NetworkSummaryCollector {
@@ -57,8 +55,8 @@ public class NetworkSummaryCollector {
                                     JSONObject appData = new JSONObject();
                                     appData.put("operator", operatorName);
                                     appData.put("app", packageName);
-                                    appData.put("rx", mobileSimPayload.getRx());
-                                    appData.put("tx", mobileSimPayload.getTx());
+                                    appData.put("rxBuckets", mobileSimPayload.getRxBuckets());
+                                    appData.put("txBuckets", mobileSimPayload.getTxBuckets());
                                     mobileSummary.put(appData);
                                 }
                             }
@@ -68,8 +66,8 @@ public class NetworkSummaryCollector {
                         JSONObject appData = new JSONObject();
                         appData.put("operator", "WIFI");
                         appData.put("app", packageName);
-                        appData.put("rx", wifiPayload.getRx());
-                        appData.put("tx", wifiPayload.getTx());
+                        appData.put("rxBuckets", wifiPayload.getRxBuckets());
+                        appData.put("txBuckets", wifiPayload.getTxBuckets());
                         wifiSummary.put(appData);
                     }
                 }
@@ -148,15 +146,15 @@ public class NetworkSummaryCollector {
 
     @TargetApi(Build.VERSION_CODES.M)
     private DataPayload fillNetworkStatsPackageWifi(NetworkStatsHelper networkStatsHelper, long start, long end) {
-        long mobileWifiRx = networkStatsHelper.getPackageRxBytesWifi(start, end);
-        long mobileWifiTx = networkStatsHelper.getPackageTxBytesWifi(start, end);
+        List<UsageBucket> mobileWifiRx = networkStatsHelper.getPackageRxBytesWifi(start, end);
+        List<UsageBucket> mobileWifiTx = networkStatsHelper.getPackageTxBytesWifi(start, end);
         return new DataPayload(mobileWifiRx, mobileWifiTx);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
     private DataPayload fillNetworkStatsPackageMobile(NetworkStatsHelper networkStatsHelper, long start, long end, String subscriberId) {
-        long mobileWifiRx = networkStatsHelper.getPackageRxBytesMobile(start, end, subscriberId);
-        long mobileWifiTx = networkStatsHelper.getPackageTxBytesMobile(start, end, subscriberId);
+        List<UsageBucket> mobileWifiRx = networkStatsHelper.getPackageRxBytesMobile(start, end, subscriberId);
+        List<UsageBucket> mobileWifiTx = networkStatsHelper.getPackageTxBytesMobile(start, end, subscriberId);
         return new DataPayload(mobileWifiRx, mobileWifiTx);
     }
 }

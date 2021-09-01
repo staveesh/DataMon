@@ -7,9 +7,14 @@ import android.net.ConnectivityManager;
 import android.os.Build;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @TargetApi(Build.VERSION_CODES.M)
 public class NetworkStatsHelper {
+
+    private static final String TAG = "NetworkStatsHelper";
 
     NetworkStatsManager networkStatsManager;
     int packageUid;
@@ -23,139 +28,100 @@ public class NetworkStatsHelper {
         this.packageUid = packageUid;
     }
 
-    public void setUid(int uid){
-        packageUid=uid;
+    public void setUid(int uid) {
+        packageUid = uid;
     }
 
-    public long getPackageRxBytesWifi(long startTime,long endTime) {
-        NetworkStats startStats, endStats = null;
+    public List<UsageBucket> getPackageRxBytesWifi(long startTime, long endTime) {
+        List<UsageBucket> buckets = new ArrayList<>();
+        NetworkStats startStats = null;
         startStats = networkStatsManager.queryDetailsForUid(
-                ConnectivityManager.TYPE_WIFI,
-                "",
-                0,
-                startTime,
-                packageUid);
-
-        long startBytes = 0L;
-        NetworkStats.Bucket bucket = new NetworkStats.Bucket();
-        while (startStats.hasNextBucket()) {
-            startStats.getNextBucket(bucket);
-            startBytes += bucket.getRxBytes();
-        }
-        startStats.close();
-
-        endStats = networkStatsManager.queryDetailsForUid(
                 ConnectivityManager.TYPE_WIFI,
                 "",
                 0,
                 endTime,
                 packageUid);
-
-        long endBytes = 0L;
-        bucket = new NetworkStats.Bucket();
-        while (endStats.hasNextBucket()) {
-            endStats.getNextBucket(bucket);
-            endBytes += bucket.getRxBytes();
-        }
-        endStats.close();
-        return endBytes-startBytes;
-    }
-
-    public long getPackageTxBytesWifi(long startTime,long endTime) {
-        NetworkStats startStats, endStats = null;
-        startStats = networkStatsManager.queryDetailsForUid(
-                ConnectivityManager.TYPE_WIFI,
-                "",
-                0,
-                startTime,
-                packageUid);
-
-        long startBytes = 0L;
         NetworkStats.Bucket bucket = new NetworkStats.Bucket();
         while (startStats.hasNextBucket()) {
             startStats.getNextBucket(bucket);
-            startBytes += bucket.getTxBytes();
+            if (bucket.getStartTimeStamp() <= endTime && startTime <= bucket.getEndTimeStamp()) {
+                UsageBucket usageBucket = new UsageBucket(bucket.getStartTimeStamp(),
+                        bucket.getEndTimeStamp(), (float) bucket.getRxBytes() / (1024 * 1024));
+                buckets.add(usageBucket);
+            }
         }
         startStats.close();
-        endStats = networkStatsManager.queryDetailsForUid(
+
+        return buckets;
+    }
+
+    public List<UsageBucket> getPackageTxBytesWifi(long startTime, long endTime) {
+        List<UsageBucket> buckets = new ArrayList<>();
+        NetworkStats startStats = null;
+        startStats = networkStatsManager.queryDetailsForUid(
                 ConnectivityManager.TYPE_WIFI,
                 "",
                 0,
                 endTime,
                 packageUid);
-
-        long endBytes = 0L;
-        bucket = new NetworkStats.Bucket();
-        while (endStats.hasNextBucket()) {
-            endStats.getNextBucket(bucket);
-            endBytes += bucket.getTxBytes();
-        }
-        endStats.close();
-        return endBytes-startBytes;
-    }
-
-    public long getPackageRxBytesMobile(long startTime, long endTime, String subscriberId){
-        NetworkStats startStats = null, endStats = null;
-        startStats = networkStatsManager.queryDetailsForUid(
-                ConnectivityManager.TYPE_MOBILE,
-                subscriberId,
-                0,
-                startTime,
-                packageUid
-        );
-        long startBytes = 0L, endBytes = 0L;
         NetworkStats.Bucket bucket = new NetworkStats.Bucket();
         while (startStats.hasNextBucket()) {
             startStats.getNextBucket(bucket);
-            startBytes += bucket.getRxBytes();
+            if (bucket.getStartTimeStamp() <= endTime && startTime <= bucket.getEndTimeStamp()) {
+                UsageBucket usageBucket = new UsageBucket(bucket.getStartTimeStamp(),
+                        bucket.getEndTimeStamp(), (float) bucket.getTxBytes() / (1024 * 1024));
+                buckets.add(usageBucket);
+            }
         }
         startStats.close();
-        endStats = networkStatsManager.queryDetailsForUid(
+
+        return buckets;
+    }
+
+    public List<UsageBucket> getPackageRxBytesMobile(long startTime, long endTime, String subscriberId) {
+        List<UsageBucket> buckets = new ArrayList<>();
+        NetworkStats startStats = null;
+        startStats = networkStatsManager.queryDetailsForUid(
                 ConnectivityManager.TYPE_MOBILE,
                 subscriberId,
                 0,
                 endTime,
                 packageUid
-        );
-        bucket = new NetworkStats.Bucket();
-        while (endStats.hasNextBucket()) {
-            endStats.getNextBucket(bucket);
-            endBytes += bucket.getRxBytes();
-        }
-        endStats.close();
-        return endBytes-startBytes;
-    }
-
-    public long getPackageTxBytesMobile(long startTime, long endTime, String subscriberId){
-        NetworkStats startStats = null, endStats = null;
-        startStats = networkStatsManager.queryDetailsForUid(
-                ConnectivityManager.TYPE_MOBILE,
-                subscriberId,
-                0,
-                startTime,
-                packageUid
-        );
-        long startBytes = 0L, endBytes = 0L;
+        ) ;
         NetworkStats.Bucket bucket = new NetworkStats.Bucket();
         while (startStats.hasNextBucket()) {
             startStats.getNextBucket(bucket);
-            startBytes += bucket.getTxBytes();
+            if (bucket.getStartTimeStamp() <= endTime && startTime <= bucket.getEndTimeStamp()) {
+                UsageBucket usageBucket = new UsageBucket(bucket.getStartTimeStamp(),
+                        bucket.getEndTimeStamp(), (float) bucket.getRxBytes() / (1024 * 1024));
+                buckets.add(usageBucket);
+            }
         }
         startStats.close();
-        endStats = networkStatsManager.queryDetailsForUid(
+        return buckets;
+    }
+
+    public List<UsageBucket> getPackageTxBytesMobile(long startTime, long endTime, String subscriberId) {
+        List<UsageBucket> buckets = new ArrayList<>();
+        NetworkStats startStats = null;
+        startStats = networkStatsManager.queryDetailsForUid(
                 ConnectivityManager.TYPE_MOBILE,
                 subscriberId,
                 0,
                 endTime,
                 packageUid
-        );
-        bucket = new NetworkStats.Bucket();
-        while (endStats.hasNextBucket()) {
-            endStats.getNextBucket(bucket);
-            endBytes += bucket.getTxBytes();
+        ) ;
+        NetworkStats.Bucket bucket = new NetworkStats.Bucket();
+        while (startStats.hasNextBucket()) {
+            startStats.getNextBucket(bucket);
+            if (bucket.getStartTimeStamp() <= endTime && startTime <= bucket.getEndTimeStamp()) {
+                UsageBucket usageBucket = new UsageBucket(bucket.getStartTimeStamp(),
+                        bucket.getEndTimeStamp(), (float) bucket.getTxBytes() / (1024 * 1024));
+                buckets.add(usageBucket);
+            }
         }
-        endStats.close();
-        return endBytes-startBytes;
+        startStats.close();
+        return buckets;
     }
 
 }

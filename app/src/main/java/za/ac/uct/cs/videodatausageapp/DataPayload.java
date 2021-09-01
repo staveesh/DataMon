@@ -1,24 +1,26 @@
 package za.ac.uct.cs.videodatausageapp;
 
-public class DataPayload {
-    private long Rx;
-    private long Tx;
+import java.util.List;
 
-    public DataPayload(long rx, long tx) {
-        Rx = rx;
-        Tx = tx;
+public class DataPayload {
+    private List<UsageBucket> rxBuckets;
+    private List<UsageBucket> txBuckets;
+
+    public DataPayload(List<UsageBucket> rxBuckets, List<UsageBucket> txBuckets) {
+        this.rxBuckets = rxBuckets;
+        this.txBuckets = txBuckets;
     }
 
     public boolean isEmptyPayload(){
-        return (Rx == 0 && Tx == 0);
+        return (rxBuckets.size() == 0 && txBuckets.size() == 0);
     }
 
-    public long getRx() {
-        return Rx;
+    public List<UsageBucket> getRxBuckets() {
+        return rxBuckets;
     }
 
-    public long getTx() {
-        return Tx;
+    public List<UsageBucket> getTxBuckets() {
+        return txBuckets;
     }
 
 }
