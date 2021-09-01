@@ -16,6 +16,8 @@ import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
 
+import com.google.gson.Gson;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -34,6 +36,7 @@ public class NetworkSummaryCollector {
         List<Package> packageList=getPackagesData();
         JSONArray wifiSummary = new JSONArray();
         JSONArray mobileSummary = new JSONArray();
+        Gson gson = new Gson();
         try {
             for (Package pckg : packageList) {
                 if(Config.VIDEO_CALL_APP_PACKAGES.contains(pckg.getName())) {
@@ -55,8 +58,8 @@ public class NetworkSummaryCollector {
                                     JSONObject appData = new JSONObject();
                                     appData.put("operator", operatorName);
                                     appData.put("app", packageName);
-                                    appData.put("rxBuckets", mobileSimPayload.getRxBuckets());
-                                    appData.put("txBuckets", mobileSimPayload.getTxBuckets());
+                                    appData.put("rxBuckets", new JSONArray(gson.toJson(mobileSimPayload.getRxBuckets())));
+                                    appData.put("txBuckets", new JSONArray(gson.toJson(mobileSimPayload.getTxBuckets())));
                                     mobileSummary.put(appData);
                                 }
                             }
@@ -66,8 +69,8 @@ public class NetworkSummaryCollector {
                         JSONObject appData = new JSONObject();
                         appData.put("operator", "WIFI");
                         appData.put("app", packageName);
-                        appData.put("rxBuckets", wifiPayload.getRxBuckets());
-                        appData.put("txBuckets", wifiPayload.getTxBuckets());
+                        appData.put("rxBuckets", new JSONArray(gson.toJson(wifiPayload.getRxBuckets())));
+                        appData.put("txBuckets", new JSONArray(gson.toJson(wifiPayload.getTxBuckets())));
                         wifiSummary.put(appData);
                     }
                 }
