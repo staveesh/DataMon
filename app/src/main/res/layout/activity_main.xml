@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/intro"
@@ -11,10 +11,39 @@
     <TextView
         android:id="@+id/welcomeText"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="359dp"
         android:text="@string/intro_txt"
         android:textAlignment="center"
         android:textColor="#000000"
         android:textSize="20sp" />
 
-</LinearLayout>
+    <ProgressBar
+        android:id="@+id/pBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_below="@id/welcomeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="20dp"
+        android:minHeight="50dp"
+        android:minWidth="200dp"
+        android:max="100"
+        android:indeterminate="false"
+        android:progress="0" />
+    <TextView
+        android:id="@+id/tView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/pBar"
+        android:layout_below="@+id/pBar" />
+    <Button
+        android:id="@+id/btnShow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="20dp"
+        android:text="Start Upload"
+        android:layout_below="@+id/tView"/>
+
+
+</RelativeLayout>

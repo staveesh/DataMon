@@ -15,14 +15,23 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
+
+import java.time.ZonedDateTime;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import za.ac.uct.cs.videodatausageapp.CollectionService.CollectionBinder;
 
@@ -38,7 +47,13 @@ public class MainActivity extends AppCompatActivity {
     private NetworkChangeReceiver connectivityReceiver;
     private String institution = null;
     private String consent = "NO";
-    private TextView welcomeText;
+    private TextView welcomeText, prText;
+    private ProgressBar progressBar;
+    private Button uploadBtn;
+    private int i = 0;
+    private Handler handler = new Handler();
+    private NetworkSummaryCollector nCollector;
+    private Date currentTime;
 
     private ServiceConnection serviceConn = new ServiceConnection() {
         @Override
@@ -86,24 +101,76 @@ public class MainActivity extends AppCompatActivity {
         app = this;
         setContentView(R.layout.activity_main);
         welcomeText = findViewById(R.id.welcomeText);
-        if(consent.equalsIgnoreCase("no")) {
+        progressBar = findViewById(R.id.pBar);
+        prText = findViewById(R.id.tView);
+        uploadBtn = findViewById(R.id.btnShow);
+        if (consent.equalsIgnoreCase("no")) {
             consentDialogWrapper();
         }
+        nCollector = new NetworkSummaryCollector(getApplicationContext());
+        uploadBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Date now = new Date();
+                Calendar c = Calendar.getInstance();
+                c.setTime(now);
+                c.add(Calendar.MONTH, -2);
+                currentTime = c.getTime();
+                i = progressBar.getProgress();
+                long diff = 1 + TimeUnit.DAYS.convert(now.getTime() - currentTime.getTime(),
+                        TimeUnit.MILLISECONDS);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        while (currentTime.before(now)) {
+                            c.add(Calendar.DATE, 1);
+                            Date next = c.getTime();
+                            String summary = nCollector.collectSummary(WebSocketConnector.getInstance().getDeviceId(),
+                                    currentTime.getTime(), next.getTime());
+                            WebSocketConnector.getInstance().
+                                    sendMessage(Config.STOMP_SERVER_SUMMARY_REPORT_ENDPOINT, summary);
+                            currentTime = next;
+                            i += 1;
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    int percentage = (int) (i*100 / diff);
+                                    progressBar.setProgress(percentage);
+                                    prText.setText(percentage+"%");
+                                }
+                            });
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressBar.setProgress(100);
+                                prText.setText("100%");
+                            }
+                        });
+                    }
+                }).start();
+            }
+        });
     }
 
-    private void restoreUserInstitution(){
+    private void restoreUserInstitution() {
         SharedPreferences prefs = getSharedPreferences(Config.PREF_KEY_USER_INSTITUTION, MODE_PRIVATE);
         institution = prefs.getString(Config.PREF_KEY_USER_INSTITUTION, null);
     }
 
-    private void restoreUserConsent(){
+    private void restoreUserConsent() {
         SharedPreferences prefs = getSharedPreferences(Config.PREF_KEY_USER_CONSENT, MODE_PRIVATE);
         consent = prefs.getString(Config.PREF_KEY_USER_CONSENT, "no");
     }
 
-    private void consentDialogWrapper(){
+    private void consentDialogWrapper() {
         restoreUserConsent();
-        if(consent.equalsIgnoreCase("no")){
+        if (consent.equalsIgnoreCase("no")) {
             showConsentDialog();
         }
     }
@@ -113,19 +180,19 @@ public class MainActivity extends AppCompatActivity {
         consentDialog.show(getSupportFragmentManager(), "consent");
     }
 
-    private void institutionDialogWrapper(){
+    private void institutionDialogWrapper() {
         restoreUserInstitution();
-        if(institution == null){
+        if (institution == null) {
             showInstitutionDialog();
         }
     }
 
-    void showInstitutionDialog(){
+    void showInstitutionDialog() {
         DialogFragment selectUni = InstitutionDialog.newInstance();
         selectUni.show(getSupportFragmentManager(), "institution");
     }
 
-    public void userCancelled(){
+    public void userCancelled() {
         Log.i("Institution", "No institution selected!");
         quitApp();
     }
@@ -143,13 +210,13 @@ public class MainActivity extends AppCompatActivity {
         System.exit(0);
     }
 
-    public void consentProvided(){
+    public void consentProvided() {
         consent = "YES";
         if (institution == null)
             institutionDialogWrapper();
     }
 
-    public void institutionSelected(String selection){
+    public void institutionSelected(String selection) {
         institution = selection;
         SharedPreferences prefs = getSharedPreferences(Config.PREF_KEY_USER_INSTITUTION, MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
@@ -184,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
                 builder.setNegativeButton("Cancel", null);
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
-            } else{
+            } else {
                 ActivityCompat.requestPermissions(MainActivity.this,
                         new String[]{
                                 Manifest.permission.READ_PHONE_STATE,
